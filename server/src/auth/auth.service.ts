@@ -1,7 +1,7 @@
+import { randomUUID } from 'node:crypto';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { v4 as uuidv4 } from 'uuid';
 import { SessionsService } from '../sessions/sessions.service';
 import { User } from '../users/entities/user.entity';
 
@@ -16,7 +16,7 @@ export class AuthService {
   async login(user: User) {
     const hasActive = await this.sessionsService.hasActiveSessions(user.id);
 
-    const jti = uuidv4();
+    const jti = randomUUID();
     const expiresIn = this.config.get<string>('JWT_EXPIRES_IN', '1d');
     const expiresAt = this.parseExpiry(expiresIn);
 

@@ -56,7 +56,8 @@ describe('POST /products (e2e)', () => {
       .send({ ...validProduct, cost: 33 });
 
     expect(res.status).toBe(400);
-    expect(res.body.message).toMatch(/multiple of 5/i);
+    const messages: string[] = Array.isArray(res.body.message) ? res.body.message : [res.body.message];
+    expect(messages.some((m) => /multiple of 5/i.test(m))).toBe(true);
   });
 
   it('returns 400 when productName is missing', async () => {

@@ -67,7 +67,8 @@ describe('/deposit (e2e)', () => {
       .send({ amount: 30 });
 
     expect(res.status).toBe(400);
-    expect(res.body.message).toMatch(/5, 10, 20, 50, 100/);
+    const messages: string[] = Array.isArray(res.body.message) ? res.body.message : [res.body.message];
+    expect(messages.some((m) => /5, 10, 20, 50, 100/.test(m))).toBe(true);
   });
 
   it('rejects denomination 0', async () => {

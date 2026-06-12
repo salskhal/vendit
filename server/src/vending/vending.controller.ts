@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, HttpCode, HttpStatus, Post, UseGuards } from '@nestjs/common';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { Roles } from '../common/decorators/roles.decorator';
 import { Role } from '../common/enums/role.enum';
@@ -16,16 +16,19 @@ export class VendingController {
   constructor(private readonly vendingService: VendingService) {}
 
   @Post('deposit')
+  @HttpCode(HttpStatus.OK)
   deposit(@CurrentUser() user: User, @Body() dto: DepositDto) {
     return this.vendingService.deposit(user.id, dto);
   }
 
   @Post('buy')
+  @HttpCode(HttpStatus.OK)
   buy(@CurrentUser() user: User, @Body() dto: BuyDto) {
     return this.vendingService.buy(user.id, dto);
   }
 
   @Post('reset')
+  @HttpCode(HttpStatus.OK)
   reset(@CurrentUser() user: User) {
     return this.vendingService.reset(user.id);
   }

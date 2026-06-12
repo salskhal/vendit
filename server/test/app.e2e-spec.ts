@@ -1,29 +1,43 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
+import { DataSource } from 'typeorm';
 import request from 'supertest';
-import { App } from 'supertest/types';
-import { AppModule } from './../src/app.module';
+import { clearDatabase, createTestApp } from './helpers/test-app.factory';
 
-describe('AppController (e2e)', () => {
-  let app: INestApplication<App>;
+describe('App (e2e)', () => {
+  let app: INestApplication;
+  let dataSource: DataSource;
+
+  beforeAll(async () => {
+    ({ app, dataSource } = await createTestApp());
+  });
+
+  afterAll(async () => {
+    await app.close();
+  });
 
   beforeEach(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile();
-
-    app = moduleFixture.createNestApplication();
-    await app.init();
+    await clearDatabase(dataSource);
   });
 
-  it('/ (GET)', () => {
+  it('GET /products returns 200 with an array (public endpoint)', () => {
     return request(app.getHttpServer())
-      .get('/')
+      .get('/products')
       .expect(200)
-      .expect('Hello World!');
+      .expect((res) => {
+        expect(Array.isArray(res.body)).toBe(true);
+      });
   });
 
-  afterEach(async () => {
-    await app.close();
+  it('POST /auth/login returns 401 for unknown credentials', () => {
+    return request(app.getHttpServer())
+      .post('/auth/login')
+      .send({ username: 'nobody', password: 'wrong' })
+      .expect(401);
+  });
+
+  it('GET /user/me returns 401 without a token', () => {
+    return request(app.getHttpServer())
+      .get('/user/me')
+      .expect(401);
   });
 });
