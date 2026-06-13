@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { MoreThan, Repository } from 'typeorm';
 import { Session } from './entities/session.entity';
 
 @Injectable()
@@ -21,7 +21,7 @@ export class SessionsService {
 
   async hasActiveSessions(userId: string): Promise<boolean> {
     const count = await this.sessionRepo.count({
-      where: { userId, isActive: true },
+      where: { userId, isActive: true, expiresAt: MoreThan(new Date()) },
     });
     return count > 0;
   }

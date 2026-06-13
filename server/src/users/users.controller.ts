@@ -33,6 +33,11 @@ export class UsersController {
     return user;
   }
 
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.usersService.findById(id);
+  }
+
   @Put(':id')
   update(
     @Param('id') id: string,
